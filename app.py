@@ -15,10 +15,10 @@ def home():
 
 @app.route('/', methods=['POST'])
 def prediction():
-    model_path = 'static\data\model.h5'
+    model_path = 'static/data/final_model.h5'
     model = load_model(model_path)
     imageFile = request.files['image_file']
-    image_path = "static/data/TESTED_PHOTOS"+imageFile.filename
+    image_path = "static/data/TESTED_PHOTOS/"+imageFile.filename
     path = [image_path]
     imageFile.save(image_path)
 
@@ -36,17 +36,11 @@ unique_breeds = np.unique(labels)
 
 
 def get_predicted_label(predictions):
-    """
-    Get the required label i.e dog breed for a particular prediction
-    """
 
     return unique_breeds[np.argmax(predictions)]
 
 
 def load_model(model_path):
-    """
-    This function is used to load a model from a given location
-    """
 
     model = tf.keras.models.load_model(model_path, custom_objects={
                                        "KerasLayer": hub.KerasLayer})
@@ -57,10 +51,6 @@ BATCH_SIZE = 32
 
 
 def create_data_batch(X, y=None, batch_size=BATCH_SIZE):
-    """
-    Creates batches of given batch size from our data.
-    It also accepts data without labels.
-    """
 
     print('Creating data batches for test data')
     data = tf.data.Dataset.from_tensor_slices(
@@ -73,9 +63,6 @@ IMG_SIZE = 224
 
 
 def image_tensors(img_path, img_size=IMG_SIZE):
-    """
-    Taking an image path and turning it into sensors 
-    """
 
     # read an image file
     image = tf.io.read_file(img_path)
