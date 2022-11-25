@@ -1,76 +1,369 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Dog Prediction</title>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Face Recognition</title>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="{{url_for('static',filename='styles/style.css')}}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
-</head>
-<body>
-<div class="header">
-    <!--Content before waves-->
-    <div class="inner-header flex">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static',filename='styles/style.css')}}"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <div id="container">
+      <canvas id="canvas"></canvas>
+      <div class="header">
         <div class="box-c">
-            <h1 id="title">
-                <a href="" class="custom-underline">Dog Breed Identification</a>
-            </h1>
+          <h1 id="title">
+            <a href="" class="custom-underline"
+              >Face Recognition using Deep Learning</a
+            >
+          </h1>
         </div>
-        <br> <br>
+        <br />
+        <br />
         <div class="form">
-            <form action="/" method="post" style="text-align: center;" class="p-3 text-center" enctype="multipart/form-data" id="formID">
-                <input class="hidden" type="file" name="image_file" id="File_input" required/>
-                <label for="File_input" class="btn btn-primary" id="label_input">Upload Image!</label>
-                <br><br>
-                <button class="btn btn-primary" id="predict_button" type="submit">Predict Breed!</button>
-            </form>
-            {%if prediction_label%}
-                <p id="result">The predicted breed of the image is <strong>{{prediction_label}}</strong></p>
-            {%endif%}
+          <form action="/" method="post" id="file-upload-form" class="uploader" enctype="multipart/form-data">
+            <input id="file-upload" type="file" name="image_file" required />
+            <label for="file-upload" id="file-drag">
+              <img id="file-image" src="#" alt="Preview" class="hidden" />
+              <div id="start">
+                <i class="fa fa-download" aria-hidden="true"></i>
+                <div>Select a file or drag here</div>
+                <div id="notimage" class="hidden">Please select an image</div>
+                <span id="file-upload-btn" class="btn btn-primary"
+                  >Select a file</span
+                >
+              </div>
+              <div id="response" class="hidden">
+                <div id="messages"></div>
+                <progress class="progress" id="file-progress" value="0">
+                  <span>0</span>%
+                </progress>
+              </div>
+            </label>
+            <button class="button" type="submit">Predict</button>
+          </form>
         </div>
-        <br> <br>
+        <br />
+        <br />
+        {%if prediction_label%}
+        <p id="result">
+          The predicted Label of the Person from the image is
+          <span>{{prediction_label}}</span>
+        </p>
+        {%endif%}
         <div class="info">
-             <p style="color: white; font-size: larger;"><strong style="color:black">Note:</strong>This model can identify a breed of a dog(only .jpg files) out of a selected 120 breeds and more info can be found in my <a href="https://github.com/Nischal-1817/Dog_Breed_Identification" id="git_link">github repo</a></p>
+          <p style="color: white; font-size: larger">
+            This model can identify the face of a celebrity (,jpg files) out of
+            105 celebrities.
+          </p>
         </div>
+      </div>
     </div>
-    
-    <!--Waves Container-->
-    <div>
-        <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-        viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
-        <defs>
-        <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
-        </defs>
-        <g class="parallax">
-        <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(255,255,255,0.7" />
-        <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(255,255,255,0.5)" />
-        <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(255,255,255,0.3)" />
-        <use xlink:href="#gentle-wave" x="48" y="7" fill="#fff" />
-        </g>
-        </svg>
-    </div>
-    <!--Waves end-->
-    
-</div>
-<!--Header ends-->
-    <div class="contact">
-        <h4>Contact me:
-        <p><strong>+91-7901391507</strong></p>
-        <p><strong>Gmail:<a href="mailto:v.nischal1817@gmail.com">v.nischal1817@gmail.com</a></strong></p>
-        </h4>
-    </div>
-    <div class="social">
-        <h4>Connect me:
-            <a href="https://in.linkedin.com/in/nischal-pradyoth-6877b3213" class="fa fa-linkedin" target="_blank" title="go to linked-in page"></a>
-            <a href="https://github.com/Nischal-1817" class="fa fa-github" target="_blank" title="go to git-hub account"></a>
-        </h4>
-    </div>
-    <!--Content starts-->
-    <div class="copyright">
-        <p><strong>Made with 🔥 by Nischal &#169 2022</strong></p>
-    </div>
-    <!--Content ends-->
-</body>
+    <script>
+      function ekUpload() {
+        function Init() {
+          console.log("Upload Initialised");
+
+          var fileSelect = document.getElementById("file-upload"),
+            fileDrag = document.getElementById("file-drag"),
+            submitButton = document.getElementById("submit-button");
+
+          fileSelect.addEventListener("change", fileSelectHandler, false);
+
+          // Is XHR2 available?
+          var xhr = new XMLHttpRequest();
+          if (xhr.upload) {
+            // File Drop
+            fileDrag.addEventListener("dragover", fileDragHover, false);
+            fileDrag.addEventListener("dragleave", fileDragHover, false);
+            fileDrag.addEventListener("drop", fileSelectHandler, false);
+          }
+        }
+
+        function fileDragHover(e) {
+          var fileDrag = document.getElementById("file-drag");
+
+          e.stopPropagation();
+          e.preventDefault();
+
+          fileDrag.className =
+            e.type === "dragover" ? "hover" : "modal-body file-upload";
+        }
+
+        function fileSelectHandler(e) {
+          // Fetch FileList object
+          var files = e.target.files || e.dataTransfer.files;
+
+          // Cancel event and hover styling
+          fileDragHover(e);
+
+          // Process all File objects
+          for (var i = 0, f; (f = files[i]); i++) {
+            parseFile(f);
+            uploadFile(f);
+          }
+        }
+
+        // Output
+        function output(msg) {
+          // Response
+          var m = document.getElementById("messages");
+          m.innerHTML = msg;
+        }
+
+        function parseFile(file) {
+          console.log(file.name);
+          output("<strong>" + encodeURI(file.name) + "</strong>");
+
+          // var fileType = file.type;
+          // console.log(fileType);
+          var imageName = file.name;
+
+          var isGood = /\.(?=gif|jpg|png|jpeg)/gi.test(imageName);
+          if (isGood) {
+            document.getElementById("start").classList.add("hidden");
+            document.getElementById("response").classList.remove("hidden");
+            document.getElementById("notimage").classList.add("hidden");
+            // Thumbnail Preview
+            document.getElementById("file-image").classList.remove("hidden");
+            document.getElementById("file-image").src =
+              URL.createObjectURL(file);
+          } else {
+            document.getElementById("file-image").classList.add("hidden");
+            document.getElementById("notimage").classList.remove("hidden");
+            document.getElementById("start").classList.remove("hidden");
+            document.getElementById("response").classList.add("hidden");
+            document.getElementById("file-upload-form").reset();
+          }
+        }
+
+        function setProgressMaxValue(e) {
+          var pBar = document.getElementById("file-progress");
+
+          if (e.lengthComputable) {
+            pBar.max = e.total;
+          }
+        }
+
+        function updateFileProgress(e) {
+          var pBar = document.getElementById("file-progress");
+
+          if (e.lengthComputable) {
+            pBar.value = e.loaded;
+          }
+        }
+
+        function uploadFile(file) {
+          var xhr = new XMLHttpRequest(),
+            fileInput = document.getElementById("class-roster-file"),
+            pBar = document.getElementById("file-progress"),
+            fileSizeLimit = 1024; // In MB
+          if (xhr.upload) {
+            // Check if file is less than x MB
+            if (file.size <= fileSizeLimit * 1024 * 1024) {
+              // Progress bar
+              pBar.style.display = "inline";
+              xhr.upload.addEventListener(
+                "loadstart",
+                setProgressMaxValue,
+                false
+              );
+              xhr.upload.addEventListener(
+                "progress",
+                updateFileProgress,
+                false
+              );
+
+              // File received / failed
+              xhr.onreadystatechange = function (e) {
+                if (xhr.readyState == 4) {
+                  //Everything is good!
+                  progress.className =
+                    xhr.status == 200 ? "success" : "failure";
+                  document.location.reload(true);
+                }
+              };
+
+              //Start upload
+              xhr.open(
+                "POST",
+                document.getElementById("file-upload-form").action,
+                true
+              );
+              xhr.setRequestHeader("X-File-Name", file.name);
+              xhr.setRequestHeader("X-File-Size", file.size);
+              xhr.setRequestHeader("Content-Type", "multipart/form-data");
+              xhr.send(file);
+            } else {
+              output(
+                "Please upload a smaller file (< " + fileSizeLimit + " MB)."
+              );
+            }
+          }
+        }
+
+        // Check for the various File API support.
+        if (window.File && window.FileList && window.FileReader) {
+          Init();
+        } else {
+          document.getElementById("file-drag").style.display = "static/styles/style.css";
+        }
+      }
+      ekUpload();
+      var w, h, loopId, id, canvas, ctx, particles;
+      var options = {
+        particleColor: "rgba(255,255,255)",
+        lineColor: "rgba(255,215,0,0.3)",
+        particleAmount: 125,
+        defaultRadius: 0.4,
+        variantRadius: 4,
+        defaultSpeed: 0.7,
+        variantSpeed: 0.7,
+        linkRadius: 145,
+      };
+
+      var rgb = options.lineColor.match(/\d+/g);
+
+      document.addEventListener("DOMContentLoaded", init);
+
+      function init() {
+        canvas = document.getElementById("canvas");
+        ctx = canvas.getContext("2d");
+        resizeReset();
+        initialiseElements();
+        startAnimation();
+      }
+
+      function resizeReset() {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+      }
+
+      function initialiseElements() {
+        particles = [];
+        for (var i = 0; i < options.particleAmount; i++) {
+          particles.push(new Particle());
+        }
+      }
+
+      function startAnimation() {
+        loopId = requestAnimationFrame(animationLoop);
+      }
+
+      function animationLoop() {
+        ctx.clearRect(0, 0, w, h);
+        drawScene();
+
+        id = requestAnimationFrame(animationLoop);
+      }
+
+      function drawScene() {
+        drawLine();
+        drawParticle();
+      }
+
+      function drawParticle() {
+        for (var i = 0; i < particles.length; i++) {
+          particles[i].update();
+          particles[i].draw();
+        }
+      }
+
+      function drawLine() {
+        for (var i = 0; i < particles.length; i++) {
+          linkPoints(particles[i], particles);
+        }
+      }
+
+      function linkPoints(point, hubs) {
+        for (var i = 0; i < hubs.length; i++) {
+          var distance = checkDistance(point.x, point.y, hubs[i].x, hubs[i].y);
+          var opacity = 1 - distance / options.linkRadius;
+          if (opacity > 0) {
+            ctx.lineWidth = 0.5;
+            ctx.strokeStyle =
+              "rgba(" +
+              rgb[3] +
+              "," +
+              rgb[1] +
+              "," +
+              rgb[3] +
+              "," +
+              opacity +
+              ")";
+            ctx.beginPath();
+            ctx.moveTo(point.x, point.y);
+            ctx.lineTo(hubs[i].x, hubs[i].y);
+            ctx.closePath();
+            ctx.stroke();
+          }
+        }
+      }
+
+      function checkDistance(x1, y1, x2, y2) {
+        return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+      }
+
+      Particle = function () {
+        var _this = this;
+
+        _this.x = Math.random() * w;
+        _this.y = Math.random() * h;
+        _this.color = options.particleColor;
+        _this.radius =
+          options.defaultRadius + Math.random() * options.variantRadius;
+        _this.speed =
+          options.defaultSpeed + Math.random() * options.variantSpeed;
+        _this.directionAngle = Math.floor(Math.random() * 100);
+        _this.vector = {
+          x: Math.cos(_this.directionAngle) * _this.speed,
+          y: Math.sin(_this.directionAngle) * _this.speed,
+        };
+
+        _this.update = function () {
+          _this.border();
+          _this.x += _this.vector.x;
+          _this.y += _this.vector.y;
+        };
+
+        _this.border = function () {
+          if (_this.x >= w || _this.x <= 0) {
+            _this.vector.x *= -1;
+          }
+          if (_this.y >= h || _this.y <= 0) {
+            _this.vector.y *= -1;
+          }
+          if (_this.x > w) _this.x = w;
+          if (_this.y > h) _this.y = h;
+          if (_this.x < 0) _this.x = 0;
+          if (_this.y < 0) _this.y = 0;
+        };
+
+        _this.draw = function () {
+          ctx.beginPath();
+          ctx.arc(_this.x, _this.y, _this.radius, 0, Math.PI * 10);
+          ctx.closePath();
+          ctx.fillStyle = _this.color;
+          ctx.fill();
+        };
+      };
+    </script>
+  </body>
 </html>
