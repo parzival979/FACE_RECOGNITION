@@ -21,6 +21,17 @@ def prediction():
     image_path = "static/data/TESTED_PHOTOS/"+imageFile.filename
     path = [image_path]
     imageFile.save(image_path)
+    # applying haar cascade to detect face
+    import cv2
+    face_cascade = cv2.CascadeClassifier(
+        'static/data/haarcascade_frontalface_alt.xml')
+    img = cv2.imread(image_path)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    faces = face_cascade.detectMultiScale(gray, 1.1, 4)
+    # crop the face
+    for (x, y, w, h) in faces:
+        roi_color = img[y:y+h, x:x+w]
+        cv2.imwrite(image_path, roi_color)
 
     data_batch = create_data_batch(X=path)
 
